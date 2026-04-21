@@ -50,34 +50,54 @@ export default function App() {
   const { loadUser, setUser } = useAuthStore();
 
   useEffect(() => {
-    loadUser();
+    let unsubscribe: (() => void) | undefined;
 
-    const {
-      data: { subscription },
-    } = authService.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT") setUser(null);
-      else if (session) loadUser();
-    });
+    const init = async () => {
+      try {
+        await loadUser();
 
-    return () => subscription.unsubscribe();
+        const result = authService?.onAuthStateChange?.((event: string, session: any) => {
+          try {
+            if (event === "SIGNED_OUT") {
+              setUser(null);
+            } else if (session) {
+              loadUser();
+            }
+          } catch (err) {
+            console.error("Auth state change error:", err);
+          }
+        });
+
+        unsubscribe = result?.data?.subscription?.unsubscribe;
+      } catch (err) {
+        console.error("App init error:", err);
+      }
+    };
+
+    init();
+
+    return () => {
+      try {
+        unsubscribe?.();
+      } catch (err) {
+        console.error("Unsubscribe error:", err);
+      }
+    };
   }, [loadUser, setUser]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <HashRouter>
         <Routes>
-          {/* Public */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/safety" element={<SafetyPage />} />
           <Route path="/contact" element={<ContactPage />} />
 
-          {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-          {/* Passenger */}
           <Route element={<ProtectedRoute />}>
             <Route element={<RoleRoute role="passenger" />}>
               <Route path="/passenger/dashboard" element={<PassengerDashboard />} />
@@ -88,7 +108,6 @@ export default function App() {
               <Route path="/passenger/history" element={<PassengerHistory />} />
             </Route>
 
-            {/* Rider */}
             <Route element={<RoleRoute role="rider" />}>
               <Route path="/rider/dashboard" element={<RiderDashboard />} />
               <Route path="/rider/route-setup" element={<RouteSetup />} />
@@ -98,7 +117,6 @@ export default function App() {
               <Route path="/rider/history" element={<RiderHistory />} />
             </Route>
 
-            {/* Admin */}
             <Route element={<RoleRoute role="admin" />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<UserManagement />} />
