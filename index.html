@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RouteMate</title>
+    <meta name="description" content="RouteMate - Your Smart Route Companion" />
+    <meta name="author" content="" />
+    <meta property="og:title" content="RouteMate" />
+    <meta property="og:description" content="RouteMate - Your Smart Route Companion" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="" />
+    <meta name="twitter:image" content="" />
+    <!-- Google Maps API -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&libraries=places&callback=initMap"
+      async
+      defer
+    ></script>
+    <script>
+      // Placeholder callback so Maps SDK doesn't throw before React loads
+      function initMap() {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
