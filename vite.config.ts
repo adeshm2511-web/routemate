@@ -4,13 +4,6 @@ import path from "path";
 
 export default defineConfig({
   base: "/routemate/",
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
-    },
-  },
   plugins: [react()],
   resolve: {
     alias: {
@@ -24,5 +17,12 @@ export default defineConfig({
       "@tanstack/react-query",
       "@tanstack/query-core",
     ],
+  },
+  server: {
+    host: "::",
+    port: 8080,
+    hmr: {
+      overlay: false,
+    },
   },
 });
