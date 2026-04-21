@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useAuthStore } from "@/store/authStore";
@@ -51,16 +51,20 @@ export default function App() {
 
   useEffect(() => {
     loadUser();
-    const { data: { subscription } } = authService.onAuthStateChange(async (event, session) => {
+
+    const {
+      data: { subscription },
+    } = authService.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_OUT") setUser(null);
       else if (session) loadUser();
     });
+
     return () => subscription.unsubscribe();
-  }, []);
+  }, [loadUser, setUser]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
@@ -105,7 +109,8 @@ export default function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
+
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
