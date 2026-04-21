@@ -1,16 +1,22 @@
 import { supabase } from "@/lib/supabase";
 import type { UserRole } from "@/types";
 
-function ensureSupabase() {
+function getSupabase() {
   if (!supabase) {
-    throw new Error("Supabase is not configured. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+    throw new Error("Supabase environment variables are missing.");
   }
   return supabase;
 }
 
 export const authService = {
-  async signUp(email: string, password: string, fullName: string, phone: string, role: UserRole) {
-    const client = ensureSupabase();
+  async signUp(
+    email: string,
+    password: string,
+    fullName: string,
+    phone: string,
+    role: UserRole
+  ) {
+    const client = getSupabase();
 
     const { data, error } = await client.auth.signUp({
       email,
@@ -37,15 +43,18 @@ export const authService = {
   },
 
   async signIn(email: string, password: string) {
-    const client = ensureSupabase();
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    const client = getSupabase();
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) throw error;
     return data;
   },
 
   async signOut() {
-    const client = ensureSupabase();
-    const { error } = await client.auth.signOut();
+    if (!supabase) return;
+    const { error } = await supabase.auth.signOut();
     if (error) throw error;
   },
 
@@ -75,7 +84,7 @@ export const authService = {
   },
 
   async resetPassword(email: string) {
-    const client = ensureSupabase();
+    const client = getSupabase();
     const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/routemate/#/reset-password`,
     });
@@ -83,7 +92,7 @@ export const authService = {
   },
 
   async updatePassword(newPassword: string) {
-    const client = ensureSupabase();
+    const client = getSupabase();
     const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw error;
   },
